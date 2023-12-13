@@ -1,0 +1,21 @@
+#! /bin/bash
+#$ -S /bin/bash
+#$ -cwd
+#$ -j y
+#$ -V
+#$ -N archiveFASTQ
+#$ -m bea
+#$ -tc 240
+#$ -o . 
+#$ -e .
+#$ -pe threaded 3
+sample_dir=$1
+line="$(sed -n -e "$SGE_TASK_ID p" ${sample_dir})"
+# just run each archive cmds, since rsync checks destination dir, with source dir. Will throw errors when if source dir doesn't have any files. So DO NOT RERUN!
+#is_merged=$(mysql --defaults-file=/home/am5153/.my.cnf -u am5153 -h prodseq -e "USE sequenceDB; SELECT is_merged FROM dragen_sample_metadata WHERE sample_name = '${line}';" | tail -n+2)
+#if [ $is_merged -eq '40' ] && [ "$(ls -A ${line}/FASTQ)" ] # when sample inDragenDB and sample/FASTQ/ is non-empty i.e archival incomplete/NOT started
+#then
+#  fcid=$(ls -1d ${line}/backup/*fastq.gz | head -n1 | awk -F'/' '{print $NF}' | awk -F'_' '{print $(NF-3)}')
+out_dir=$(echo $line | awk -F'/' '{printf "%s/%s\n",$(NF-2),$(NF-1)}')
+echo rsync -azpvv -L --no-owner --no-perms ${line}/*gz ${out_dir}/
+rsync -azpvv -L --no-owner --no-perms ${line}/*gz ${out_dir}/

@@ -1,0 +1,3 @@
+pseudo_prepid	WGS_Mean_Cov	ROUND_WGS_Mean_Cov
+234235	25.4642	25.464
+234236	25.9143	25.914

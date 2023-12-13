@@ -1,0 +1,17 @@
+#! /bin/bash
+#$ -S /bin/bash
+#$ -cwd
+#$ -j y
+#$ -V
+#$ -N archiveFASTQ
+#$ -m bea
+#$ -tc 240
+#$ -o . 
+#$ -e .
+#$ -pe threaded 1
+samples_file=$1
+fcid="HDUMM2022"
+line="$(sed -n -e "$SGE_TASK_ID p" ${samples_file})"
+# just run each archive cmds, since rsync checks destination dir, with source dir. Will throw errors when if source dir doesn't have any files. So DO NOT RERUN!
+echo "rsync -azpvv -L --no-owner --no-perms --remove-source-files ${line}/FASTQ/ /nfs/archive/p2018/FASTQ/EXOME/${line}/${fcid}/" > cmdsToArchive.${line}.sh
+mkdir -p /nfs/archive/p2018/FASTQ/EXOME/${line}/${fcid} && rsync -azpvv -L --no-owner --no-perms --remove-source-files ${line}/FASTQ/ /nfs/archive/p2018/FASTQ/EXOME/${line}/${fcid}/ && rm -rf ${line}
